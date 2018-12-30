@@ -9,9 +9,10 @@ class App extends Component {
 
   state = {
     error: null,
-    status: 0,
+    status: 3,
     message: '',
     messages: [],
+    nickname: '',
   };
 
   constructor(props: any) {
@@ -49,7 +50,17 @@ class App extends Component {
     });
   }
 
-  onMessageSubmit = (e: any) => {
+  componentDidMount() {
+    const nickname = window.localStorage.getItem('nickname');
+
+    if (nickname) {
+      this.setState({
+        nickname,
+      });
+    }
+  }
+
+  onMessageSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     this.ws.json({ action: 'message', body: this.state.message });
@@ -58,44 +69,43 @@ class App extends Component {
     });
   };
 
-  render() {
+  renderContent = () => {
+    if (this.state.status === 0) return <p>Connecting...</p>;
+    if (this.state.status === 2) return <p>Error 😭</p>;
+
     return (
-      <div className="App">
-        <header className="App-header">
-          {this.state.status === 0 && <p>Connecting...</p>}
-          {this.state.status === 1 && (
-            <>
-              <ChatFeed
-                messages={this.state.messages}
-                hasInputField={false}
-                showSenderName
-                bubblesCentered={false}
-                bubbleStyles={{
-                  text: {
-                    fontSize: 14,
-                    color: 'black',
-                  },
-                  chatbubble: {
-                    borderRadius: 20,
-                    padding: 10,
-                  },
-                }}
-                maxHeight={window.innerHeight - 200}
-              />
-              <form onSubmit={e => this.onMessageSubmit(e)}>
-                <input
-                  placeholder="Type a message..."
-                  className="message-input"
-                  value={this.state.message}
-                  onChange={e => this.setState({ message: e.target.value })}
-                />
-              </form>
-            </>
-          )}
-          {this.state.status === 2 && <p>Error 😭</p>}
-        </header>
-      </div>
+      <>
+        <ChatFeed
+          messages={this.state.messages}
+          hasInputField={false}
+          showSenderName
+          bubblesCentered={false}
+          bubbleStyles={{
+            text: {
+              fontSize: 14,
+              color: 'white',
+            },
+            chatbubble: {
+              borderRadius: 20,
+              padding: 10,
+            },
+          }}
+          maxHeight={window.innerHeight - 200}
+        />
+        <form onSubmit={e => this.onMessageSubmit(e)} className="message-form">
+          <input
+            placeholder="Type a message..."
+            className="message-input"
+            value={this.state.message}
+            onChange={e => this.setState({ message: e.target.value })}
+          />
+        </form>
+      </>
     );
+  };
+
+  render() {
+    return <div className="App">{this.renderContent()}</div>;
   }
 }
 

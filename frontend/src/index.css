@@ -13,13 +13,13 @@ code {
     monospace;
 }
 
-form {
+.message-form {
   width: 100%;
   position: fixed;
   bottom: 0;
 }
 
-input {
+.message-input {
   border: none;
   border-top: 1px solid #ddd;
   font-size: 16px;
