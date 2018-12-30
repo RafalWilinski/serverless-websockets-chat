@@ -1,0 +1,39 @@
+Resources:
+  MessagesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: chat-messages-${self:custom.stage}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: partitioningKey
+          AttributeType: S
+        - AttributeName: createdAt
+          AttributeType: N
+      # Shard messages by messageId
+      KeySchema:
+        - AttributeName: partitioningKey
+          KeyType: HASH
+        # sort messages by createdAt timestamp
+        - AttributeName: createdAt
+          KeyType: RANGE
+  ConnectionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: chat-connections-${self:custom.stage}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: connectionId
+          AttributeType: S
+        - AttributeName: joinedAt
+          AttributeType: N
+      # Shard connections by connectionId
+      KeySchema:
+        - AttributeName: connectionId
+          KeyType: HASH
+      # Sort using joinedAt timestamp
+        - AttributeName: joinedAt
+          KeyType: RANGE
+      # Kill AFK connections after time specified in custom.sessionTTL
+      TimeToLiveSpecification:
+        Enabled: true
+        AttributeName: terminateAt

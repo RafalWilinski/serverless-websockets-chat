@@ -1,0 +1,57 @@
+service:
+  name: serverless-websockets-chat
+
+plugins:
+  - serverless-webpack
+  - serverless-websockets-plugin
+
+custom:
+  stage: ${opt:stage, 'dev'}
+  sessionTTL: 600
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  websocketApiName: serverless-websockets-chat
+  websocketApiRouteSelectionExpression: $request.body.action
+  environment:
+    MESSAGES_TABLE: chat-messages-${self:custom.stage}
+    CONNECTIONS_TABLE: chat-connections-${self:custom.stage}
+    SESSION_TTL: ${self:custom.sessionTTL}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - "execute-api:ManageConnections"
+      Resource:
+        - "arn:aws:execute-api:*:*:**/@connections/*"
+    - Effect: 'Allow'
+      Action:
+        - 'dynamodb:*'
+      Resource:
+        - "Fn::GetAtt": [ MessagesTable, Arn ]
+        - "Fn::GetAtt": [ ConnectionsTable, Arn ]
+
+functions:
+  onConnect:
+    handler: functions/connectionManagement.onConnect
+    events:
+      - websocket:
+          routeKey: $connect
+  onDisconnect:
+    handler: functions/connectionManagement.onDisconnect
+    events:
+      - websocket:
+          routeKey: $disconnect
+  setNickname:
+    handler: functions/setNickname.index
+    events:
+      - websocket:
+          routeKey: rename
+  chatMessage:
+    handler: functions/chatMessage.index
+    events:
+      - websocket:
+          routeKey: message
+
+resources:
+  - ${file(./infra/dynamodb.yml)}
