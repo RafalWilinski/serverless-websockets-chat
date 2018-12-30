@@ -1,4 +1,8 @@
-import websocketsClient from '../websocketsClient';
+import websocketsClient from "../websocketsClient";
+import { getAllConnections } from "./dynamodb";
 
-export default (ids: any[], msg: any, ws: websocketsClient) =>
-  ids.map(async id => ws.send(msg, id));
+export default async (msg: any, ws: websocketsClient) => {
+  const { Items } = await getAllConnections();
+
+  return Items.map(connection => ws.send(msg, connection.connectionId));
+};

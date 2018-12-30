@@ -5,13 +5,13 @@ Resources:
       TableName: chat-messages-${self:custom.stage}
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
-        - AttributeName: partitioningKey
+        - AttributeName: roomKey
           AttributeType: S
         - AttributeName: createdAt
           AttributeType: N
       # Shard messages by messageId
       KeySchema:
-        - AttributeName: partitioningKey
+        - AttributeName: roomKey
           KeyType: HASH
         # sort messages by createdAt timestamp
         - AttributeName: createdAt
@@ -24,15 +24,31 @@ Resources:
       AttributeDefinitions:
         - AttributeName: connectionId
           AttributeType: S
+        - AttributeName: roomKey
+          AttributeType: S
         - AttributeName: joinedAt
           AttributeType: N
-      # Shard connections by connectionId
       KeySchema:
+        # Shard connections by connectionId
         - AttributeName: connectionId
           KeyType: HASH
-      # Sort using joinedAt timestamp
+        # Sort using joinedAt timestamp
         - AttributeName: joinedAt
           KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: roomKeyGSI
+          KeySchema:
+            # Shard connections by roomKey
+            - AttributeName: roomKey
+              KeyType: HASH
+            # Sort using joinedAt timestamp
+            - AttributeName: joinedAt
+              KeyType: RANGE
+          # ProvisionedThroughput:
+          #   ReadCapacityUnits: 1
+          #   WriteCapacityUnits: 1
+          Projection:
+            ProjectionType: "ALL"
       # Kill AFK connections after time specified in custom.sessionTTL
       TimeToLiveSpecification:
         Enabled: true

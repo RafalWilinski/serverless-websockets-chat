@@ -1,4 +1,4 @@
-import { DynamoDB } from 'aws-sdk';
+import { DynamoDB } from "aws-sdk";
 
 const dynamo = new DynamoDB.DocumentClient();
 
@@ -12,8 +12,8 @@ export const saveConnection = (connectionId: string, connectedAt: number) =>
         terminateAt: (
           connectedAt / 1000 +
           parseInt(process.env.SESSION_TTL)
-        ).toFixed(0),
-      },
+        ).toFixed(0)
+      }
     })
     .promise();
 
@@ -23,8 +23,8 @@ export const deleteConnection = (connectionId: string, connectedAt: number) =>
       TableName: process.env.CONNECTIONS_TABLE,
       Key: {
         connectionId,
-        joinedAt: connectedAt,
-      },
+        joinedAt: connectedAt
+      }
     })
     .promise();
 
@@ -34,20 +34,20 @@ export const getAllConnections = () =>
 export const rename = (
   connectionId: string,
   connectedAt: number,
-  name: string,
+  name: string
 ) =>
   dynamo
     .update({
       TableName: process.env.CONNECTIONS_TABLE,
       Key: {
         connectionId,
-        joinedAt: connectedAt,
+        joinedAt: connectedAt
       },
-      ExpressionAttributeNames: { '#name': 'name' },
-      UpdateExpression: 'set #name = :name',
+      ExpressionAttributeNames: { "#name": "name" },
+      UpdateExpression: "set #name = :name",
       ExpressionAttributeValues: {
-        ':name': name,
-      },
+        ":name": name
+      }
     })
     .promise();
 
@@ -57,8 +57,9 @@ export const putMessage = (body: string) =>
       TableName: process.env.MESSAGES_TABLE,
       Item: {
         body,
-        partitioningKey: 'PARTITION_0',
-      },
+        roomKey: "PARTITION_0",
+        createdAt: +new Date()
+      }
     })
     .promise();
 
@@ -66,11 +67,11 @@ export const getLastNMessagesByTime = (from: number, count: number) =>
   dynamo
     .query({
       TableName: process.env.MESSAGES_TABLE,
-      KeyConditionExpression: 'partitioningKey = :hkey and createdAt < :rkey',
+      KeyConditionExpression: "roomKey = :hkey and createdAt < :rkey",
       ExpressionAttributeValues: {
-        ':hkey': 'PARTITION_0',
-        ':rkey': from,
+        ":hkey": "PARTITION_0",
+        ":rkey": from
       },
-      Limit: count,
+      Limit: count
     })
     .promise();

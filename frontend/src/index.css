@@ -8,23 +8,22 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
-}
-
 .message-form {
   width: 100%;
   position: fixed;
   bottom: 0;
 }
 
-.message-input {
+input {
   border: none;
   border-top: 1px solid #ddd;
   font-size: 16px;
   padding: 20px;
   width: calc(100% - 40px);
+}
+
+p {
+  text-align: center;
 }
 
 #chat-panel {

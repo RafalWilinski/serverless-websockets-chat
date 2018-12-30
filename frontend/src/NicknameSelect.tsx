@@ -1,15 +1,20 @@
-import React, { SyntheticEvent } from 'react';
+import React from "react";
 
-export default class extends React.Component {
+interface NicknameSelectProps {
+  onNicknameSubmit(nickname: string): void;
+}
+export default class extends React.Component<NicknameSelectProps> {
   state = {
-    nickname: '',
+    nickname: ""
   };
 
-  onNicknameSubmit = (e: React.FormEvent<HTMLFormElement>) => {};
+  onNicknameSubmit = () => {
+    this.props.onNicknameSubmit(this.state.nickname);
+  };
 
   render() {
     return (
-      <form onSubmit={e => this.onNicknameSubmit(e)}>
+      <form onSubmit={this.onNicknameSubmit}>
         <input
           placeholder="Pick username"
           className="nickname-input"
