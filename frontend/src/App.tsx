@@ -4,7 +4,6 @@ import Sockette from "sockette";
 
 import { ServiceEndpoint } from "./stack.json";
 import NicknameSelect from "./NicknameSelect";
-import { WSAEACCES } from "constants";
 
 class App extends Component {
   private ws: any;
@@ -62,7 +61,8 @@ class App extends Component {
             ...this.state.messages,
             new Message({
               id: this.state.nickname === data.author ? 0 : 1,
-              message: data.body
+              message: data.body,
+              senderName: data.author
             })
           ]
         },
@@ -76,12 +76,14 @@ class App extends Component {
           messages: [
             ...this.state.messages,
             ...data.messages
+              .sort((a: any, b: any) => a.createdAt - b.createdAt)
               .map((message: any) => JSON.parse(message.body))
               .map(
                 (data: any) =>
                   new Message({
                     id: this.state.nickname === data.author ? 0 : 1,
-                    message: data.body
+                    message: data.body,
+                    senderName: data.author
                   })
               )
           ]
@@ -135,7 +137,7 @@ class App extends Component {
               padding: 10
             }
           }}
-          maxHeight={window.innerHeight - 200}
+          maxHeight={window.innerHeight - 60}
         />
         <form onSubmit={e => this.onMessageSubmit(e)} className="message-form">
           <input

@@ -72,6 +72,7 @@ export const getLastNMessagesByTime = (from: number, count: number) =>
         ":hkey": "PARTITION_0",
         ":rkey": from
       },
-      Limit: count
+      Limit: count,
+      ScanIndexForward: false // Change order to descending!
     })
     .promise();
