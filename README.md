@@ -1,4 +1,4 @@
-# SeArverless Realtime Chat
+# Serverless Realtime Chat
 
 Based on Serverless Framework, API Gateway Websockets, Typescript & React.
 
