@@ -6,7 +6,9 @@ Based on Serverless Framework, API Gateway Websockets, Typescript & React.
 
 ```sh
 cd backend
+npm install
 npm run deploy
 cd ../frontend
+npm install
 npm start
 ```
